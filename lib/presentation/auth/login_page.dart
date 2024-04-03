@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_posresto/presentation/home/dashboard_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,7 @@ import '../../components/custom_text_field.dart';
 import '../../components/spaces.dart';
 import '../../core/assets/assets.gen.dart';
 import '../../core/core.dart';
+import 'bloc/login/login_bloc.dart';
 // import '../../home/pages/main_nav_desktop.dart';
 
 class LoginPage extends StatefulWidget {
@@ -77,16 +79,44 @@ class _LoginPageState extends State<LoginPage> {
             obscureText: true,
           ),
           const SpaceHeight(24.0),
-          Button.filled(
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const DashboardPage(),
-                ),
-              );
+          BlocListener<LoginBloc, LoginState>(
+            listener: (context, state) {
+              state.maybeWhen(
+                  orElse: () {},
+                  success: (authResponseModel) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DashboardPage(),
+                      ),
+                    );
+                  },
+                  error: (message) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(message),
+                        backgroundColor: AppColors.red,
+                      ),
+                    );
+                  });
             },
-            label: 'Masuk',
+            child: BlocBuilder<LoginBloc, LoginState>(
+              builder: (context, state) {
+                return state.maybeWhen(orElse: () {
+                  return Button.filled(
+                    onPressed: () {
+                      context.read<LoginBloc>().add(
+                            LoginEvent.login(
+                              email: emailController.text,
+                              password: passwordController.text,
+                            ),
+                          );
+                    },
+                    label: 'Masuk',
+                  );
+                });
+              },
+            ),
           ),
         ],
       ),

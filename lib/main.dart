@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_posresto/data/datasources/auth_local_datasource.dart';
 import 'package:flutter_posresto/data/datasources/auth_remote_datasource.dart';
 import 'core/core.dart';
 import 'package:flutter_posresto/presentation/auth/login_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'presentation/auth/bloc/bloc/logout_bloc.dart';
 import 'presentation/auth/bloc/login/login_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'presentation/home/dashboard_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,8 +21,15 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => LoginBloc(AuthRemoteDatasource()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => LoginBloc(AuthRemoteDatasource()),
+        ),
+        BlocProvider(
+          create: (context) => LogoutBloc(AuthRemoteDatasource()),
+        ),
+      ],
       child: MaterialApp(
         title: 'POS RESTO BIZAN',
         theme: ThemeData(
@@ -40,7 +51,29 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const LoginPage(),
+        home: FutureBuilder<bool>(
+            future: AuthLocalDataSource().isAuthDataExist(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Scaffold(
+                  body: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              if (snapshot.hasData) {
+                if (snapshot.data!) {
+                  return const DashboardPage();
+                } else {
+                  return const LoginPage();
+                }
+              }
+              return const Scaffold(
+                body: Center(
+                  child: Text('Something went wrong'),
+                ),
+              );
+            }),
       ),
     );
   }

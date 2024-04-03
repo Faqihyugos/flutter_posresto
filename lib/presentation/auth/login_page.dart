@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_posresto/pages/home/dashboard_page.dart';
+import 'package:flutter_posresto/presentation/home/dashboard_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter/services.dart';
 
-import '../../../components/buttons.dart';
-import '../../../components/custom_text_field.dart';
-import '../../../components/spaces.dart';
-import '../../../core/assets/assets.gen.dart';
-import '../../../core/core.dart';
+import '../../components/buttons.dart';
+import '../../components/custom_text_field.dart';
+import '../../components/spaces.dart';
+import '../../core/assets/assets.gen.dart';
+import '../../core/core.dart';
 // import '../../home/pages/main_nav_desktop.dart';
 
 class LoginPage extends StatefulWidget {
@@ -17,12 +18,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   @override
   void dispose() {
-    usernameController.dispose();
+    emailController.dispose();
     passwordController.dispose();
     super.dispose();
   }
@@ -66,8 +67,8 @@ class _LoginPageState extends State<LoginPage> {
           ),
           const SpaceHeight(40.0),
           CustomTextField(
-            controller: usernameController,
-            label: 'Username',
+            controller: emailController,
+            label: 'Email',
           ),
           const SpaceHeight(12.0),
           CustomTextField(
